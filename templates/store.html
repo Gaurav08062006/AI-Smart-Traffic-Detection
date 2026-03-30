@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Stored Videos</title>
+
+```
+<style>
+    body {
+        background: black;
+        color: white;
+        text-align: center;
+        font-family: Arial;
+    }
+
+    .video-list button {
+        margin: 10px;
+        padding: 10px 15px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .graph {
+        background: white;
+        padding: 10px;
+        width: 600px;
+        margin: 20px auto;
+    }
+</style>
+```
+
+</head>
+
+<body>
+
+<h1>📁 Stored Videos</h1>
+
+<!-- VIDEO SELECTION -->
+
+<div class="video-list">
+    {% for video in videos %}
+        <button onclick="loadVideo('{{ video }}')">
+            {{ video }}
+        </button>
+    {% endfor %}
+</div>
+
+<!-- VIDEO PLAYER -->
+
+<div>
+    <img id="videoPlayer" src="" width="600">
+</div>
+
+<!-- GRAPH -->
+
+<div class="graph">
+    <h3>Traffic Trend</h3>
+    <canvas id="chart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+let currentVideo = null;
+
+// LOAD VIDEO
+function loadVideo(videoName) {
+    currentVideo = videoName;
+
+    document.getElementById("videoPlayer").src =
+        "/video/" + videoName + "?t=" + new Date().getTime();
+}
+
+// GRAPH
+const ctx = document.getElementById('chart').getContext('2d');
+
+const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Vehicle Count',
+            data: [],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: true
+            }
+        },
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Time (Frames)'
+                }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: 'Number of Vehicles'
+                },
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// UPDATE GRAPH
+setInterval(() => {
+    if (!currentVideo) return;
+
+    fetch('/graph_data/' + currentVideo)
+    .then(res => res.json())
+    .then(data => {
+        chart.data.labels = data.map((_, i) => i);
+        chart.data.datasets[0].data = data;
+        chart.update();
+    });
+}, 1000);
+</script>
+
+</body>
+</html>
