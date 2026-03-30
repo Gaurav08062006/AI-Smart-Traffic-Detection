@@ -1,0 +1,62 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Data and models (not committed)
+data/
+*.pt
+
+# Logs and runtime
+*.log
+*.pid
+
+# IDE and OS files
+*.swp
+*.swo
+Thumbs.db
+
+# pipenv
+Pipfile.lock
+
+# Compiled Python
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Python / C-extension binaries and packages
+**/site-packages/
+**/Lib/site-packages/
+**/Lib/site-packages/*
+*.dll
+*.lib
+*.pyd
+*.so
+
+# Local virtualenv / Python env directories
+.venv/
+env/
+venv/
+
+# Large model or video artifacts (if present)
+*.h5
+*.pt
+*.pth
+*.onnx
+*.mp4
+*.avi
+
