@@ -38,11 +38,20 @@
 <!-- VIDEO SELECTION -->
 
 <div class="video-list">
-    {% for video in videos %}
-        <button onclick="loadVideo('{{ video }}')">
-            {{ video }}
+    {% for name, url in videos.items() %}
+        <button onclick="loadVideo('{{ name }}')">
+            {{ name }}
         </button>
     {% endfor %}
+</div>
+
+<div style="margin-top: 20px; color: #eee; font-size: 0.9rem;">
+    <p>Mapped URLs (for debugging):</p>
+    <ul>
+    {% for name, url in videos.items() %}
+        <li><strong>{{ name }}</strong>: {{ url }}</li>
+    {% endfor %}
+    </ul>
 </div>
 
 <!-- VIDEO PLAYER -->
@@ -67,8 +76,9 @@ let currentVideo = null;
 function loadVideo(videoName) {
     currentVideo = videoName;
 
+    const encoded = encodeURIComponent(videoName);
     document.getElementById("videoPlayer").src =
-        "/video/" + videoName + "?t=" + new Date().getTime();
+        "/video/" + encoded + "?t=" + new Date().getTime();
 }
 
 // GRAPH
@@ -113,7 +123,7 @@ const chart = new Chart(ctx, {
 setInterval(() => {
     if (!currentVideo) return;
 
-    fetch('/graph_data/' + currentVideo)
+    fetch('/graph_data/' + encodeURIComponent(currentVideo))
     .then(res => res.json())
     .then(data => {
         chart.data.labels = data.map((_, i) => i);

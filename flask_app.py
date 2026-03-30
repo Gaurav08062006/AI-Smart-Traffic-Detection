@@ -2,6 +2,7 @@ from flask import Flask, render_template, Response, request, redirect, url_for, 
 import cv2
 import os
 import config
+from urllib.parse import unquote_plus, quote_plus
 
 from src.detector import detect
 from src.tracker import SimpleTracker
@@ -44,14 +45,14 @@ def index():
 # 📁 STORE PAGE
 @app.route('/store')
 def store():
-    videos = os.listdir(VIDEO_FOLDER)
+    videos = config.VIDEO_URLS
     return render_template('store.html', videos=videos)
 
 
 # ==============================
 # GRAPH API
 # ==============================
-@app.route('/graph_data/<source>')
+@app.route('/graph_data/<path:source>')
 def graph_data(source):
     return jsonify(video_history.get(source, []))
 
@@ -148,10 +149,19 @@ def process_frame(frame, source):
 # 🎥 STORED VIDEO
 @app.route('/video/<filename>')
 def video(filename):
-    path = os.path.join(VIDEO_FOLDER, filename)
+    # filename is logical name e.g. video1, video2, etc.
+    video_url = config.VIDEO_URLS.get(filename)
+
+    if video_url is None:
+        return f"Video '{filename}' not found", 404
 
     def gen():
-        cap = cv2.VideoCapture(path)
+        cap = cv2.VideoCapture(video_url)
+
+        if not cap.isOpened():
+            # fallback local path
+            local_path = os.path.join(VIDEO_FOLDER, os.path.basename(video_url))
+            cap = cv2.VideoCapture(local_path)
 
         while True:
             success, frame = cap.read()
